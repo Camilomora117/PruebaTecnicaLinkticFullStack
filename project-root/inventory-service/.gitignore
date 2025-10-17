@@ -52,10 +52,6 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-# Environment files
-environments/*.env
-!environments/*.example.env
-
 # OS
 .DS_Store
 .DS_Store?
