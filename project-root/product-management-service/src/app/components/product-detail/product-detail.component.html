@@ -1,0 +1,105 @@
+<div class="detail-container">
+  <!-- Loader mientras carga -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-card class="loading-card">
+      <mat-card-content>
+        <div class="loading-content">
+          <mat-spinner diameter="60"></mat-spinner>
+          <h2>Cargando producto...</h2>
+          <p>Por favor espera un momento</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Contenido del producto -->
+  <div *ngIf="!isLoading && (inventory$ | async) as inventory; else notFound" class="detail-content">
+    <mat-card class="detail-card">
+      <mat-card-header>
+        <mat-card-title class="product-title">{{ inventory.name }}</mat-card-title>
+      </mat-card-header>
+
+      <mat-divider></mat-divider>
+
+      <mat-card-content>
+        <div class="product-info-section">
+          <div class="info-row">
+            <mat-icon class="info-icon">description</mat-icon>
+            <div class="info-content">
+              <h3>Descripción</h3>
+              <p>{{ inventory.description }}</p>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="info-row">
+            <mat-icon class="info-icon">attach_money</mat-icon>
+            <div class="info-content">
+              <h3>Precio</h3>
+              <p class="price-value">{{ formatPrice(inventory.price) }}</p>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="info-row">
+            <mat-icon class="info-icon">inventory</mat-icon>
+            <div class="info-content">
+              <h3>Stock Disponible</h3>
+              <mat-chip-set>
+                <mat-chip 
+                  [class.low-stock]="inventory.quantity < 10 && inventory.quantity > 0" 
+                  [class.out-of-stock]="inventory.quantity === 0"
+                  [class.good-stock]="inventory.quantity >= 10">
+                  {{ inventory.quantity }} unidades
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="info-row">
+            <mat-icon class="info-icon">tag</mat-icon>
+            <div class="info-content">
+              <h3>ID del Producto</h3>
+              <p class="product-id">#{{ inventory.productId }}</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="action-buttons">
+        <button mat-raised-button (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+          Volver
+        </button>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="buyProduct(inventory.productId, inventory.quantity)"
+          [disabled]="inventory.quantity === 0">
+          <mat-icon>shopping_cart</mat-icon>
+          {{ inventory.quantity === 0 ? 'Sin Stock' : 'Comprar Producto' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <ng-template #notFound>
+    <mat-card class="not-found-card">
+      <mat-card-content>
+        <div class="not-found-content">
+          <mat-icon class="not-found-icon">error_outline</mat-icon>
+          <h2>Producto no encontrado</h2>
+          <p>El producto que buscas no existe o ha sido eliminado.</p>
+          <button mat-raised-button color="primary" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+            Volver al catálogo
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-template>
+</div>

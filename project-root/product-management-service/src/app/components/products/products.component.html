@@ -1,0 +1,44 @@
+<div class="products-container">
+  <h1 class="page-title">Catálogo de Productos</h1>
+  
+  <!-- Loader mientras carga -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="60"></mat-spinner>
+    <p class="loading-text">Cargando productos...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="hasError && !isLoading" class="error-container">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <h2>Error al cargar productos</h2>
+    <p>Por favor, verifica tu conexión e intenta nuevamente.</p>
+  </div>
+  
+  <div *ngIf="!isLoading && !hasError" class="products-grid">
+    <mat-card *ngFor="let product of products$ | async" class="product-card">
+      <mat-card-header>
+        <mat-card-title>{{ product.name }}</mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="product-info">
+          <p class="product-description">{{ product.description }}</p>
+          
+          <div class="product-details">
+            <div class="price-section">
+              <span class="price-label">Precio:</span>
+              <span class="price-value">{{ formatPrice(product.price) }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="viewDetails(product.id)">
+          <mat-icon>visibility</mat-icon>
+          Ver detalles
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

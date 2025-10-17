@@ -1,0 +1,98 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: testdb
+      TZ: America/Bogota
+    ports:
+      - "5432:5432"
+    volumes:
+      # 1️⃣ Volumen para persistir datos de la base
+      - postgres-data:/var/lib/postgresql/data
+      # 2️⃣ Script SQL de inicialización
+      - ./db/init/script_sql_products.sql:/docker-entrypoint-initdb.d/script_sql_products.sql:ro
+      - ./db/init/script_sql_inventory.sql:/docker-entrypoint-initdb.d/script_sql_inventory.sql:ro
+      - ./db/init/script_sql_purchase.sql:/docker-entrypoint-initdb.d/script_sql_purchase.sql:ro
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser -d testdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  products-service:
+    build:
+      context: ./project-root/products-service
+      dockerfile: Dockerfile
+    container_name: products-service
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/testdb
+      SPRING_DATASOURCE_USERNAME: testuser
+      SPRING_DATASOURCE_PASSWORD: testpassword
+      SERVER_PORT: 8080
+      PRODUCTS_API_KEY: products-api-key-123
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  inventory-service:
+    build:
+      context: ./project-root/inventory-service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/testdb
+      SPRING_DATASOURCE_USERNAME: testuser
+      SPRING_DATASOURCE_PASSWORD: testpassword
+      SERVER_PORT: 8081
+      INVENTORY_API_KEY: inventory-api-key-123
+      PRODUCTS_SERVICE_URL: http://products-service:8080
+      PRODUCTS_SERVICE_API_KEY: products-api-key-123
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "8081:8081"
+    networks:
+      - backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      products-service:
+        condition: service_started
+
+  product-management-service:
+    build:
+      context: ./project-root/product-management-service
+      dockerfile: Dockerfile
+    container_name: product-management-service
+    restart: always
+    ports:
+      - "4200:80"
+    networks:
+      - backend
+    depends_on:
+      products-service:
+        condition: service_started
+      inventory-service:
+        condition: service_started
+
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge

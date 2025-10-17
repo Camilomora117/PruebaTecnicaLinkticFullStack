@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: inventory-service
+  config:
+    import: optional:file:./environments/${SPRING_PROFILES_ACTIVE:dev}.env
+  
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/testdb}
+    username: ${SPRING_DATASOURCE_USERNAME:testuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:testpassword}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+server:
+  port: ${SERVER_PORT:8081}
+
+logging:
+  level:
+    com.example.inventoryservice: ${LOGGING_LEVEL_COM_EXAMPLE_INVENTORYSERVICE:DEBUG}
+    org.springframework.web: DEBUG
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui
+    operationsSorter: method
+    tagsSorter: alpha
+
+# Inventory Service Configuration
+inventory:
+  api-key: ${INVENTORY_API_KEY:inventory-api-key-123}
+  products-service:
+    base-url: ${PRODUCTS_SERVICE_URL:http://localhost:8080}
+    api-key: ${PRODUCTS_SERVICE_API_KEY:products-api-key-123}
+    timeout:
+      connect: ${PRODUCTS_SERVICE_CONNECT_TIMEOUT:2000}
+      read: ${PRODUCTS_SERVICE_READ_TIMEOUT:2000}
+    retry:
+      max-attempts: ${PRODUCTS_SERVICE_RETRY_MAX_ATTEMPTS:2}
+      backoff-delay: ${PRODUCTS_SERVICE_RETRY_BACKOFF_DELAY:1000}
+

@@ -1,0 +1,111 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Inventory Service API",
+    "version": "1.0.0",
+    "description": "Contrato OAS del microservicio de inventario"
+  },
+  "servers": [
+    { "url": "http://localhost:8081", "description": "Local" }
+  ],
+  "paths": {
+    "/inventory/{productId}": {
+      "get": {
+        "summary": "Obtener inventario por productId",
+        "operationId": "getInventoryByProductId",
+        "parameters": [
+          { "name": "productId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inventario del producto",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/InventoryResponse" } }
+            }
+          },
+          "404": { "description": "No encontrado" }
+        }
+      },
+      "put": {
+        "summary": "Actualizar cantidad de inventario",
+        "operationId": "updateInventoryQuantity",
+        "parameters": [
+          { "name": "productId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/InventoryRequest" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inventario actualizado",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/InventoryResponse" } }
+            }
+          },
+          "404": { "description": "No encontrado" }
+        }
+      }
+    },
+    "/purchase": {
+      "post": {
+        "summary": "Registrar una compra de productos",
+        "operationId": "processPurchase",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/PurchaseRequest" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Compra procesada",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/PurchaseResponse" } }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "InventoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "productId": { "type": "integer", "format": "int64" },
+          "quantity": { "type": "integer", "format": "int32" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "InventoryRequest": {
+        "type": "object",
+        "required": ["quantity"],
+        "properties": {
+          "quantity": { "type": "integer", "format": "int32" }
+        }
+      },
+      "PurchaseRequest": {
+        "type": "object",
+        "required": ["productId", "quantity"],
+        "properties": {
+          "productId": { "type": "integer", "format": "int64" },
+          "quantity": { "type": "integer", "format": "int32" }
+        }
+      },
+      "PurchaseResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "productId": { "type": "integer", "format": "int64" },
+          "quantity": { "type": "integer", "format": "int32" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}

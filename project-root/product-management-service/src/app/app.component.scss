@@ -1,0 +1,5 @@
+.main-content {
+  margin-top: 64px; // Height of the fixed header
+  min-height: calc(100vh - 64px);
+  padding: 24px 0;
+}

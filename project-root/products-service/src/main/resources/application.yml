@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: product-service
+  config:
+    import: optional:file:./environments/${SPRING_PROFILES_ACTIVE:dev}.env
+  
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/testdb}
+    username: ${SPRING_DATASOURCE_USERNAME:testuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:testpassword}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+logging:
+  level:
+    com.example.productservice: ${LOGGING_LEVEL_COM_EXAMPLE_PRODUCTSERVICE:DEBUG}
+    org.springframework.web: DEBUG
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui
+    operationsSorter: method
+    tagsSorter: alpha
+
+# Products Service Configuration
+products:
+  api-key: ${PRODUCTS_API_KEY:products-api-key-123}
+
